@@ -2,8 +2,6 @@
 
 Seguramente conocés la funcionalidad de Notificaciones de Facebook: es esa campanita arriba en el menú donde te muestra las nuevas alertas que el sistema tiene para mostrarte sobre distintos temas: un amigo cumple años, una página que seguís compartió una publicación, un amigo publicó una foto, alguien comentó un posteo tuyo, una sugerencia de amistad, etc.
 
-image.png
-
 Facebook no es el único. En general todas las aplicaciones tienen un sistema de alertas o notificaciones. En este ejercicio, te vamos a pedir que hagas una versión muy simplificada.
 
 Se pide programar un sistema para enviar alertas a usuarios que tenga la siguiente funcionalidad:
@@ -60,16 +58,18 @@ Creemos que la resolución no debería tomarte más de 1 día. Pero entendemos q
 
 ---
 
-## Resolucion
+## Resolucion - Francisco Herrea
 
 ### Ejercicio - Sistema de Alertas
 
 - Para poder ejecutar los tests unitarios es necesario contar con [Java 17](https://www.oracle.com/java/technologies/downloads/#java17) o superior.
 
 - Luego, en una terminal, ejecutar lo siguiente para el caso de un entorno `Linux`:
+
   `.\mvnw test`
 
 - o lo siguiente para el caso de un entorno `Windows`:
+
   `.\mvnw.cmd test`
 
 ### Ejercicio SQL
