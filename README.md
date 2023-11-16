@@ -58,17 +58,17 @@ Creemos que la resolución no debería tomarte más de 1 día. Pero entendemos q
 
 ---
 
-## Resolucion - Francisco Herrea
+## Resolucion - Francisco Herrera
 
 ### Ejercicio - Sistema de Alertas
 
 - Para poder ejecutar los tests unitarios es necesario contar con [Java 17](https://www.oracle.com/java/technologies/downloads/#java17) o superior.
 
-- Luego, en una terminal, ejecutar lo siguiente para el caso de un entorno `Linux`:
+- Luego, en una terminal, ejecutar el siguiente comando para el caso de un entorno `Linux`:
 
   `.\mvnw test`
 
-- o lo siguiente para el caso de un entorno `Windows`:
+- o para el caso de un entorno `Windows`:
 
   `.\mvnw.cmd test`
 

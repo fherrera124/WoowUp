@@ -164,7 +164,7 @@ class UnitTests {
 
         new Alert(null, topicTest, "");
 
-        // both users has only alert active (the same alert)
+        // both users have only one alert active (the same alert)
         assertEquals(1, userTest.getAlerts().size());
         assertEquals(1, secondUserTest.getAlerts().size());
 
