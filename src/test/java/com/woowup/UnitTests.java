@@ -73,7 +73,7 @@ class UnitTests {
 
         alert.setExpirationDate(now.plus(1, ChronoUnit.SECONDS));
         Thread.sleep(2000);
-        // alert must be inactive after two second
+        // alert must be inactive after two seconds
         assertEquals(0, topicTest.getAlerts().size());
 
     }
