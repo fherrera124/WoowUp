@@ -21,6 +21,7 @@ Se pide programar un sistema para enviar alertas a usuarios que tenga la siguien
 11. Tanto para el punto 9 como el 10, el ordenamiento de las alertas es el siguiente: las Urgentes van al inicio, siendo la última en llegar la primera en obtenerse (LIFO). Y a continuación las informativas, siendo la primera en llegar la primera en obtenerse (FIFO). Ej: Dadas las siguientes alertas Informativas y Urgentes que llegan en el siguiente orden: I1,I2,U1,I3,U2,I4 se ordenarán de la siguiente forma --> U2,U1,I1,I2,I3,I4
 
 ## Aclaraciones importantes:
+
 - La aplicación se ejecuta desde línea de comando. En ningún caso pedimos que escribas código de front end, tampoco que hagas impresiones a la consola.
 - Debe tener Tests Unitarios.
 - No debés hacer ningún tipo de persistencia de datos (base de datos, archivos). Todo debe resolverse con estructuras en memoria.
@@ -44,14 +45,40 @@ Cuando revisamos el ejercicio, esto es lo que evaluamos:
 Podés usar cualquier lenguaje con el que te sientas cómodo, creemos que una buen a programadora puede ser productiva en cualquier lenguaje. Sugerencia: Podés usar https://www.github.com/ para compartirnos el código.
 
 ## Ejercicio SQL
+
 Escribir una consulta SQL que traiga todos los clientes que han comprado en total más de 100,000$ en los últimos 12 meses usando las siguientes tablas:
 
-Clientes: ID, Nombre, Apellido
+`Clientes: ID, Nombre, Apellido`
 
-Ventas: Fecha, Sucursal, Numero_factura, Importe, Id_cliente
+`Ventas: Fecha, Sucursal, Numero_factura, Importe, Id_cliente`
 
-Algunas consideraciones más
+## Algunas consideraciones más
 
 Creemos que la resolución no debería tomarte más de 1 día. Pero entendemos que podés tener otros compromisos o restricciones de tiempo. Por favor, contame aproximadamente cuándo puedo esperar tus respuestas (ej: hoy a la tarde / en 2 o 3 días / el fin de semana).
 
 ¡Éxitos!
+
+---
+
+## Resolucion
+
+### Ejercicio - Sistema de Alertas
+
+- Para poder ejecutar los tests unitarios es necesario contar con [Java 17](https://www.oracle.com/java/technologies/downloads/#java17) o superior.
+
+- Luego, en una terminal, ejecutar lo siguiente para el caso de un entorno `Linux`:
+  `.\mvnw test`
+
+- o lo siguiente para el caso de un entorno `Windows`:
+  `.\mvnw.cmd test`
+
+### Ejercicio SQL
+
+```
+SELECT c.ID, c.Nombre, c.Apellido
+FROM Clientes c
+INNER JOIN Ventas v ON c.ID = v.Id_cliente
+WHERE v.Fecha >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+GROUP BY c.ID, c.Nombre, c.Apellido
+HAVING SUM(v.Importe) > 100000;
+```
