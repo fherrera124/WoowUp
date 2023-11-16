@@ -20,9 +20,11 @@ public class Topic extends EntityAlertHandler {
 
         var targetedUser = alert.getTargetedUser();
         if (targetedUser != null) {
+            validateSubscription(targetedUser);
+            // only the targeted subscriber get the alert
             targetedUser.getNotified(alert);
         } else {
-            // only the users who are subscribed to this topic get the alert
+            // all the subscribers get the alert
             for (var user : this.users) {
                 user.getNotified(alert);
             }
@@ -33,6 +35,12 @@ public class Topic extends EntityAlertHandler {
     // subscribe an user to this topic
     public void subscribe(User user) {
         this.users.add(user);
+    }
+
+    private void validateSubscription(User targetedUser) {
+        this.users.stream().filter(user -> user == targetedUser)
+                .findFirst().orElseThrow(() -> new IllegalArgumentException(
+                        "El usuario " + targetedUser.getFullName() + " no está suscrito a este tema"));
     }
 
 }

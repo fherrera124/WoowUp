@@ -108,9 +108,25 @@ class UnitTests {
     }
 
     @Test
+    void validateSubscriptionBeforeTargetedAlertTest() {
+
+        var topic = new Topic("");
+
+        // user cannot receive the targeted alert,
+        // since is not subscribed to the topic
+        assertThrows(IllegalArgumentException.class, () -> new Alert(AlertTypeEnum.INFORMATIVE, topic, userTest, ""));
+
+        topic.subscribe(userTest);
+        // now the user can receive the targeted alert
+        new Alert(AlertTypeEnum.INFORMATIVE, topic, userTest, "");
+
+    }
+
+    @Test
     void alertTargetTest() {
 
         var topic = new Topic("");
+        topic.subscribe(userTest);
 
         new Alert(AlertTypeEnum.INFORMATIVE, topic, "ALERT1");
         new Alert(AlertTypeEnum.INFORMATIVE, topic, userTest, "ALERT2");
