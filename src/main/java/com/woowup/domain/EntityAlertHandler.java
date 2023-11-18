@@ -9,7 +9,7 @@ public abstract class EntityAlertHandler {
 
     public List<Alert> getAlerts() {
         var now = LocalDateTime.now();
-        return SortingStrategy.sort(alerts).stream()
+        return alerts.stream()
                 .filter(alert -> alert.getExpirationDate() == null ||
                         alert.getExpirationDate().isAfter(now))
                 .toList();
@@ -17,5 +17,5 @@ public abstract class EntityAlertHandler {
 
     // actions that the concrete class instance
     // must follow when receiving an alert
-    public abstract void getNotified(Alert alert);
+    public abstract void resolveIncomingAlert(Alert alert);
 }

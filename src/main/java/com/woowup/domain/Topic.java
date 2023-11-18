@@ -15,25 +15,33 @@ public class Topic extends EntityAlertHandler {
     // following the Observer pattern, the users are the observers
     private Set<User> users = new HashSet<>();
 
-    public void getNotified(Alert alert) {
-        alerts.add(alert);
+    /*
+     * An example of polymorphism: both Topic and User implement the
+     * abstract method "resolveIncomingAlert(Alert)" as dictated by the abstract
+     * class EntityAlertHandler.
+     * Note that the Topic's implementation, internally calls the User's
+     * implementation
+     */
+    public void resolveIncomingAlert(Alert alert) {
 
-        var targetedUser = alert.getTargetedUser();
-        if (targetedUser != null) {
+        if (alert.isTargeted()) {
+            var targetedUser = alert.getTargetedUser();
             validateSubscription(targetedUser);
             // only the targeted subscriber get the alert
-            targetedUser.getNotified(alert);
+            targetedUser.resolveIncomingAlert(alert);
         } else {
             // all the subscribers get the alert
             for (var user : this.users) {
-                user.getNotified(alert);
+                user.resolveIncomingAlert(alert);
             }
         }
-
+        // finally, if everything went well, the alert is
+        // stacked in the queue of this topic
+        alert.stackInQueue(alerts);
     }
 
-    // subscribe an user to this topic
-    public void subscribe(User user) {
+    // add an observer to this topic
+    public void addObserver(User user) {
         this.users.add(user);
     }
 

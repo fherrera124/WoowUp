@@ -2,18 +2,18 @@ package com.woowup.domain;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Data
-public class Alert {
-    private final AlertTypeEnum type;
+public abstract class Alert implements StackingStrategy<Alert> {
+    @Getter
     private final User targetedUser;
-    private final Topic topic;
+    @Getter
     private final String content;
+    @Getter
     private LocalDateTime expirationDate = null;
     private Map<User, Status> statuses = new HashMap<>();
 
@@ -50,26 +50,18 @@ public class Alert {
         this.expirationDate = date;
     }
 
-    //////////////// Constructors ////////////////
-
-    public Alert(AlertTypeEnum type, Topic topic, String content) {
-        this.type = type;
-        this.topic = topic;
-        this.content = content;
-        this.targetedUser = null;
-        // delegating to the topic itself
-        // the notification of this alert
-        topic.getNotified(this);
+    public void stackInQueue(List<Alert> alerts) {
+        // any alert must know how to stack itself in the queue
+        this.stackInQueue(alerts, this);
     }
 
-    public Alert(AlertTypeEnum type, Topic topic, User user, String content) {
-        this.type = type;
-        this.topic = topic;
+    // constructor
+    protected Alert(Topic topic, User user, String content) {
         this.content = content;
         this.targetedUser = user;
         // delegating to the topic itself
         // the notification of this alert
-        topic.getNotified(this);
+        topic.resolveIncomingAlert(this);
     }
     //////////////////////////////////////////////
 

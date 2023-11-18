@@ -16,13 +16,13 @@ public class User extends EntityAlertHandler {
         this.surname = surname;
     }
 
-    // 9. Se pueden obtener todas las alertas no expiradas de un usuario que aún no ha leído.
+    // Adds another filter from the one it already inherits from
     public List<Alert> getAlerts() {
         return super.getAlerts().stream().filter(alert -> !alert.wasReadByUser(this)).toList();
     }
 
-    public void getNotified(Alert alert) {
-        alerts.add(alert);
+    public void resolveIncomingAlert(Alert alert) {
+        alert.stackInQueue(alerts);
         alert.doneNotified(this);
     }
 
@@ -39,7 +39,7 @@ public class User extends EntityAlertHandler {
     }
 
     public void subscribeToTopic(Topic topic) {
-        topic.subscribe(this);
+        topic.addObserver(this);
     }
 
     public String getFullName() {

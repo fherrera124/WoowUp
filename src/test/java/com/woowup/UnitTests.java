@@ -11,10 +11,11 @@ import java.time.temporal.ChronoUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
-import com.woowup.domain.Alert;
-import com.woowup.domain.AlertTypeEnum;
+import com.woowup.domain.InformativeAlert;
 import com.woowup.domain.Topic;
+import com.woowup.domain.UrgentAlert;
 import com.woowup.domain.User;
 
 class UnitTests {
@@ -30,14 +31,14 @@ class UnitTests {
         userTest = new User("Woow", "Up");
         topicTest = new Topic("art");
 
-        new Alert(AlertTypeEnum.INFORMATIVE, topicTest, "");
+        InformativeAlert.builder().topic(topicTest).content("").build();
     }
 
     @Test
     void subscriptionTest() {
 
         // the subscription
-        topicTest.subscribe(userTest);
+        userTest.subscribeToTopic(topicTest);
 
         // the topic has one alert
         assertEquals(1, topicTest.getAlerts().size());
@@ -46,9 +47,9 @@ class UnitTests {
         // method) was emited BEFORE the subscription
         assertEquals(0, userTest.getAlerts().size());
 
-        new Alert(AlertTypeEnum.INFORMATIVE, topicTest, "");
+        InformativeAlert.builder().topic(topicTest).content("").build();
 
-        // topic received the alert, as usual
+        // topic received the alert, as expected
         assertEquals(2, topicTest.getAlerts().size());
         // the user received his first alert from the topic,
         // since the alert was emited AFTER the subscription
@@ -81,8 +82,10 @@ class UnitTests {
     @Test
     void readAlertTest() {
 
-        topicTest.subscribe(userTest);
-        var alert = new Alert(AlertTypeEnum.INFORMATIVE, topicTest, "");
+        userTest.subscribeToTopic(topicTest);
+
+        var alert = InformativeAlert.builder().topic(topicTest).content("").build();
+
         assertEquals(1, userTest.getAlerts().size());
 
         userTest.markAlertAsRead(alert);
@@ -98,7 +101,8 @@ class UnitTests {
     @Test
     void alertNotRegisteredTest() {
 
-        var alert = new Alert(AlertTypeEnum.URGENT, topicTest, "New art paintings have arrived at the museum");
+        var alert = UrgentAlert.builder().topic(topicTest).content("New art paintings have arrived at the museum")
+                .build();
 
         // the user is not subscribed to the topic
         assertThrows(IllegalArgumentException.class, () -> userTest.markAlertAsRead(alert));
@@ -108,17 +112,19 @@ class UnitTests {
     }
 
     @Test
-    void validateSubscriptionBeforeTargetedAlertTest() {
+    void validateSubscriptionBeforeTargetedAlertTest() throws Throwable {
 
         var topic = new Topic("");
 
+        Executable lambda = () -> InformativeAlert.builder().topic(topic).targetedUser(userTest).content("").build();
+
         // user cannot receive the targeted alert,
         // since is not subscribed to the topic
-        assertThrows(IllegalArgumentException.class, () -> new Alert(AlertTypeEnum.INFORMATIVE, topic, userTest, ""));
+        assertThrows(IllegalArgumentException.class, lambda);
 
-        topic.subscribe(userTest);
+        userTest.subscribeToTopic(topic);
         // now the user can receive the targeted alert
-        new Alert(AlertTypeEnum.INFORMATIVE, topic, userTest, "");
+        lambda.execute();
 
     }
 
@@ -126,13 +132,13 @@ class UnitTests {
     void alertTargetTest() {
 
         var topic = new Topic("");
-        topic.subscribe(userTest);
+        userTest.subscribeToTopic(topic);
 
-        new Alert(AlertTypeEnum.INFORMATIVE, topic, "ALERT1");
-        new Alert(AlertTypeEnum.INFORMATIVE, topic, userTest, "ALERT2");
-        new Alert(AlertTypeEnum.URGENT, topic, "ALERT3");
-        new Alert(AlertTypeEnum.INFORMATIVE, topic, userTest, "ALERT4");
-        new Alert(AlertTypeEnum.URGENT, topic, "ALERT5");
+        InformativeAlert.builder().topic(topic).content("ALERT1").build();
+        InformativeAlert.builder().topic(topic).targetedUser(userTest).content("ALERT2").build();
+        UrgentAlert.builder().topic(topic).content("ALERT3").build();
+        InformativeAlert.builder().topic(topic).targetedUser(userTest).content("ALERT4").build();
+        UrgentAlert.builder().topic(topic).content("ALERT5").build();
 
         for (var alert : topic.getAlerts()) {
             switch (alert.getContent()) {
@@ -159,17 +165,17 @@ class UnitTests {
 
         var secondUserTest = new User("", "");
 
-        topicTest.subscribe(userTest);
-        topicTest.subscribe(secondUserTest);
+        userTest.subscribeToTopic(topicTest);
+        secondUserTest.subscribeToTopic(topicTest);
 
-        new Alert(null, topicTest, "");
+        InformativeAlert.builder().topic(topicTest).content("").build();
 
         // both users have only one alert active (the same alert)
         assertEquals(1, userTest.getAlerts().size());
         assertEquals(1, secondUserTest.getAlerts().size());
 
         // alert targeted to secondUserTest
-        new Alert(null, topicTest, secondUserTest, "");
+        InformativeAlert.builder().topic(topicTest).targetedUser(secondUserTest).content("").build();
 
         // userTest was not notified by the topic, even though he is
         // subscribed to the topic and the alert belongs to that topic.
@@ -182,19 +188,20 @@ class UnitTests {
 
     @Test
     void sortingTest() {
-
-        // Dadas las siguientes alertas
-        // Informativas y Urgentes que llegan en el siguiente orden: I1,I2,U1,I3,U2,I4
-        // se ordenarán de la siguiente forma --> U2,U1,I1,I2,I3,I4
+        /*
+         * Given the following Informative and Urgent alerts that arrive in the
+         * following order: I1,I2,U1,I3,U2,I4. They will be ordered as follows:
+         * U2,U1,I1,I2,I3,I4
+         */
 
         var topic = new Topic("");
 
-        new Alert(AlertTypeEnum.INFORMATIVE, topic, "I1");
-        new Alert(AlertTypeEnum.INFORMATIVE, topic, "I2");
-        new Alert(AlertTypeEnum.URGENT, topic, "U1");
-        new Alert(AlertTypeEnum.INFORMATIVE, topic, "I3");
-        new Alert(AlertTypeEnum.URGENT, topic, "U2");
-        new Alert(AlertTypeEnum.INFORMATIVE, topic, "I4");
+        InformativeAlert.builder().topic(topic).content("I1").build();
+        InformativeAlert.builder().topic(topic).content("I2").build();
+        UrgentAlert.builder().topic(topic).content("U1").build();
+        InformativeAlert.builder().topic(topic).content("I3").build();
+        UrgentAlert.builder().topic(topic).content("U2").build();
+        InformativeAlert.builder().topic(topic).content("I4").build();
 
         var alerts = topic.getAlerts();
 
